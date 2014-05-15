@@ -15,7 +15,7 @@ defmodule Exrabbit.Tools.Supervisor do
   end
 
   def init([]) do
-    children = Keyword.get(Mix.Project.config, :rabbitmq_handlers, []) |> Enum.map(start_rabbit_handler)
+    children = Keyword.get(Mix.Project.config, :rabbitmq_handlers, []) |> Enum.map &( start_rabbit_handler &1 )
     supervise(children, strategy: :one_for_one)
   end
 end

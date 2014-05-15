@@ -9,11 +9,11 @@ defmodule Exrabbit.Tools do
   end
 
   def join(name, pid) do 
-    :pg2.join(binary_to_atom "#{name}_listeners", pid)
+    :pg2.join(binary_to_atom("#{name}_listeners"), pid)
   end
 
   def leave(name, pid) do 
-    :pg2.leave(binary_to_atom "#{name}_listeners", pid)
+    :pg2.leave(binary_to_atom("#{name}_listeners"), pid)
   end
 
 end
