@@ -7,4 +7,13 @@ defmodule Exrabbit.Tools do
     :pg2.start
     Exrabbit.Tools.Supervisor.start_link
   end
+
+  def join(name, pid) do 
+    :pg2.join(binary_to_atom "#{name}_listeners", pid)
+  end
+
+  def leave(name, pid) do 
+    :pg2.leave(binary_to_atom "#{name}_listeners", pid)
+  end
+
 end

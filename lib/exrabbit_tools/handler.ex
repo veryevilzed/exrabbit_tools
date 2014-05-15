@@ -1,7 +1,7 @@
 defmodule Exrabbit.Tools.Handler do
   use GenServer.Behaviour
 
-  defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, opts: [] ]
+  defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
 
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
@@ -37,21 +37,22 @@ defmodule Exrabbit.Tools.Handler do
 
   def init(opts) do
     name = Keyword.get(opts, :name, __MODULE__)
-
-    :erlang.send_after 600, self, :init
-    { :ok, State.new().opts(opts) }
+    :erlang.send_after 600, self, :init 
+    { :ok, State.new().opts(opts).pg2(binary_to_atom "#{name}_listeners") }
   end
 
   def handle_call(_, from, state=State[amqp: nil]) do
     { :reply, :connection_down, state }
   end
 
-  def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=State[channel: channel, opts: opts]) do
+  def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=State[channel: channel, pg2: pg2_name, opts: opts, name: name]) do
     IO.puts "<-- #{inspect body}"
+    :pg2.get_members(pg2_name) |> Enum.each fn(pid) ->
+      :gen_server.call pid, {:rabbit, {body, name} }
+    end
     Exrabbit.Utils.ack channel, tag
     { :noreply, state }
   end
-
 
   def handle_info(:init, state=State[]) do
     state = rabbit_connect(state)
@@ -72,7 +73,6 @@ defmodule Exrabbit.Tools.Handler do
   end
 
   def terminate(reason, state=State[amqp: amqp, name: name] ) do
-    :pg2.leave(name, self)
     Exrabbit.Utils.disconnect(amqp)
   end
 
