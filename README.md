@@ -75,7 +75,7 @@ worker.ex
 
 ```
 
-defmodule Exrabbit.Tools.Handler do
+defmodule Demo.Worker do
   use GenServer.Behaviour
 
   def start_link(_), do: :gen_server.start_link(__MODULE__, [], [])
