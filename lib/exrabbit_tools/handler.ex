@@ -5,22 +5,18 @@ defmodule Exrabbit.Tools.Handler do
 
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
-    Lager.info "Start provider server #{name}"
     :gen_server.start_link(__MODULE__, opts, [])
   end
 
-  defp q_subscribe(queue, channel) when is_binary queue and queue != "" do 
-    Exrabbit.Utils.subscribe channel, queue
-    IO.puts "Subscribe to queue #{queue}"
-  end
+  defp q_subscribe(queue, channel) when is_binary queue and queue != "", do: Exrabbit.Utils.subscribe channel, queue
   defp q_subscribe(queues, channel) when is_list(queues), do: Enum.each fn(queue)-> q_subscribe(channel, queue) end
   defp q_subscribe(_, _), do: :ok
 
   defp ex_subscribe(exchange, channel) when is_binary exchange and exchange != "" do 
     queue = Exrabbit.Utils.declare_queue(channel) # Анонимная, пока только она
+    # TODO: Routkey
     Exrabbit.Utils.bind_queue(channel, queue, exchange)
     Exrabbit.Utils.subscribe channel, queue
-    IO.puts "Subscribe to exchange #{exchange} with queue #{queue}"
   end  
   defp ex_subscribe(exchanges, channel) when is_list(exchanges), do: Enum.each fn(exchange)-> ex_subscribe(channel, exchange) end
   defp ex_subscribe(_, _), do: :ok
@@ -70,6 +66,5 @@ defmodule Exrabbit.Tools.Handler do
   def handle_info(_, state=State[]), do: { :noreply, state }
 
   def terminate(_, State[amqp: amqp]), do: Exrabbit.Utils.disconnect(amqp)
-
 
 end

@@ -13,6 +13,6 @@ defmodule Exrabbit.Tools.Mixfile do
   end
 
   defp deps do
-    [ { :exrabbit, path: "../exrabbit/" } ]
+    [ { :exrabbit, git: "git@git.appforge.ru:elixir/exrabbit.git" } ]
   end
 end

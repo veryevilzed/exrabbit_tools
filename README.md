@@ -15,7 +15,10 @@ defmodule Demo.Mixfile do
   def project do
     [app: :demo,
      version: "0.0.1",
-     deps: deps
+     deps: deps,
+     env: [
+        dev: dev
+        ]
      ]
   end
 
@@ -36,8 +39,15 @@ defmodule Demo.Mixfile do
         virtual_host: "/",
         heartbeat: 5
         ],
+        
       queue: "test1",
-      exchange: nil
+      # queue: ["test1", "test2"], # Using for multi queue
+      
+      exchange: nil,
+      exchange_key: ""
+      #exchange_queue: nil, # For annonimus queue
+      #exchange: "ex1", # Using for Exchange
+
     ]
   ]
 
