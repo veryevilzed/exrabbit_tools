@@ -5,13 +5,13 @@ defmodule Exrabbit.Tools.Supervisor do
     :supervisor.start_link(__MODULE__, [])
   end
 
-  defp start_rabbit_handler(opts) do
-    name = case Dict.get opts, :name, :unnamed do
+  defp start_rabbit_handler({name, opts}) do
+    name = case name do
       name when is_binary name -> binary_to_atom(name)
       name -> name
     end
     :pg2.create(binary_to_atom "#{name}_listeners" )
-    worker(Exrabbit.Tools.Handler, [opts], [id: name])
+    worker(Exrabbit.Tools.Handler, [Dict.put(opts, :name, name)], [id: name])
   end
 
   def get_listeners(configs), do: Enum.map(configs, &( start_rabbit_handler &1 ))
