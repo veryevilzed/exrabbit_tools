@@ -8,7 +8,7 @@ defmodule Exrabbit.Tools.Mixfile do
   end
 
   def application do
-    [applications: [],
+    [applications: [:exrabbit_tools],
      mod: {Exrabbit.Tools, []}]
   end
 
