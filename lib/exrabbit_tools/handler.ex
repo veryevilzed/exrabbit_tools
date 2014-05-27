@@ -5,10 +5,10 @@ defmodule Exrabbit.Tools.Handler do
 
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
-    :gen_server.start_link(__MODULE__, opts, [])
+    :gen_server.start_link({:local, name}, __MODULE__, opts, [])
   end
 
-  defp q_subscribe(queue, channel) when is_binary queue and queue != "", do: Exrabbit.Utils.subscribe channel, queue
+  defp q_subscribe(queue, channel) when is_binary(queue) and queue != "", do: Exrabbit.Utils.subscribe(channel, queue)
   defp q_subscribe(queues, channel) when is_list(queues), do: Enum.each fn(queue)-> q_subscribe(channel, queue) end
   defp q_subscribe(_, _), do: :ok
 
