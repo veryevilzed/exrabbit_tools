@@ -8,11 +8,12 @@ defmodule Exrabbit.Tools.Supervisor do
   
   def get_listeners(configs) do
     configs |> Enum.map fn({name, opts}) -> 
+      IO.puts "Create worker #{name}"
       name = case name do
         name when is_binary name -> binary_to_atom(name)
         name -> name
       end
-      :pg2.create(binary_to_atom "#{name}_listeners" )
+      :pg2.create(binary_to_atom "#{name}_listeners")
       worker(Exrabbit.Tools.Handler, [Dict.put(opts, :name, name)], [id: name])
     end
   end
