@@ -12,14 +12,17 @@ defmodule Exrabbit.Tools.Handler do
   defp q_subscribe(queues, channel) when is_list(queues), do: Enum.each fn(queue)-> q_subscribe(channel, queue) end
   defp q_subscribe(_, _), do: :ok
 
-  defp ex_subscribe(exchange, channel) when is_binary exchange and exchange != "" do 
-    queue = Exrabbit.Utils.declare_queue(channel) # Анонимная, пока только она
-    # TODO: Routkey
-    Exrabbit.Utils.bind_queue(channel, queue, exchange)
+  defp ex_subscribe(exchange, channel, exchange_queue, key) when is_binary(exchange) and exchange != "" do 
+    queue = case exchange_queue do
+      qname when is_binary(qname) and qname != "" -> Exrabbit.Utils.declare_queue(channel, qname)
+      _ -> Exrabbit.Utils.declare_queue(channel) 
+    end
+    Exrabbit.Utils.bind_queue(channel, queue, exchange, "")
     Exrabbit.Utils.subscribe channel, queue
   end  
-  defp ex_subscribe(exchanges, channel) when is_list(exchanges), do: Enum.each fn(exchange)-> ex_subscribe(channel, exchange) end
-  defp ex_subscribe(_, _), do: :ok
+  defp ex_subscribe(exchanges, channel, key) when is_list(exchanges), do: Enum.each fn(exchange)-> ex_subscribe(channel, exchange, nil, key) end
+  defp ex_subscribe(_, _, _), do: :ok
+  defp ex_subscribe(_, _, _, _), do: :ok
 
 
   defp rabbit_connect(state=State[opts: opts]) do
@@ -27,7 +30,7 @@ defmodule Exrabbit.Tools.Handler do
     amqp = Exrabbit.Utils.connect connect
     channel = Exrabbit.Utils.channel amqp
     Keyword.get(opts, :queue, :nil) |> q_subscribe(channel)
-    Keyword.get(opts, :exchange, :nil) |> ex_subscribe(channel)
+    Keyword.get(opts, :exchange, :nil) |> ex_subscribe(channel, Keyword.get(opts, :exchange_queue, nil), Keyword.get(opts, :exchange_key, ""))
     state.amqp(amqp).channel(channel).amqp_monitor(:erlang.monitor :process, amqp).channel_monitor(:erlang.monitor :process, channel)
   end
 
@@ -37,7 +40,17 @@ defmodule Exrabbit.Tools.Handler do
     { :ok, State.new().opts(opts).pg2(binary_to_atom "#{name}_listeners") }
   end
 
+  
+  def handle_call({:publish, exchange, routing_key, message}, _from, state=State[channel: channel]) do
+    IO.puts "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
+    {:reply, Exrabbit.Utils.publish(channel, exchange, routing_key, message, :wait_confirmation), state}
+  end
+
   def handle_call(_, _from, state=State[amqp: nil]), do: { :reply, :connection_down, state }
+
+  def handle_call(_, _from, state=State[]), do: { :reply, :error, state }
+
+  
 
   def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=State[channel: channel, pg2: pg2_name, name: name]) do
     IO.puts "<-- #{inspect body}"

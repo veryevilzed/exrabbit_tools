@@ -15,11 +15,7 @@ defmodule Demo.Mixfile do
   def project do
     [app: :demo,
      version: "0.0.1",
-     deps: deps,
-     env: [
-        dev: dev
-        ]
-     ]
+     deps: deps
   end
 
   def application do
@@ -30,31 +26,40 @@ defmodule Demo.Mixfile do
   end
 
   def dev, do: [
-    rabbit_config: [
-      name: :rabbit_demo_1,
-      connect: [
-        username: "guest",
-        password: "guest",
-        host: '127.0.0.1',
-        virtual_host: "/",
-        heartbeat: 5
-        ],
-        
-      queue: "test1",
-      # queue: ["test1", "test2"], # Using for multi queue
-      
-      exchange: nil,
-      exchange_key: ""
-      #exchange_queue: nil, # For annonimus queue
-      #exchange: "ex1", # Using for Exchange
-
-    ]
   ]
 
   defp deps do
     [ { :exrabbit_tools, git: "path_to_exrabbit_tools.git" } ]
   end
 end
+
+```
+
+config/config.exs
+
+```
+[ demo:[
+    rabbit_config: [
+      rabbit_demo_1: [
+        connect: [
+          username: "guest",
+          password: "guest",
+          host: '127.0.0.1',
+          virtual_host: "/",
+          heartbeat: 5
+          ],
+          
+        queue: "test1",
+        # queue: ["test1", "test2"], # Using for multi queue
+        
+        exchange: nil,
+        exchange_key: ""
+        #exchange_queue: nil, # For annonimus queue
+        #exchange: "ex1", # Using for Exchange
+      ]
+    ]
+  ]
+]
 
 
 ```
