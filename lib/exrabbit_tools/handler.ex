@@ -35,7 +35,7 @@ defmodule Exrabbit.Tools.Handler do
     channel = Exrabbit.Utils.channel amqp
     Keyword.get(opts, :queue, :nil) |> q_subscribe(channel)
     Keyword.get(opts, :exchange, :nil) |> ex_subscribe(channel, Keyword.get(opts, :exchange_queue, nil), Keyword.get(opts, :exchange_key, ""))
-    %{ state | amqp: amqp, channel: channel, amqp_monitor: :erlang.monitor(:process, amqp), channel_monitor: :erlang.monitor(:process, channel) }
+    %{ state | name: Dict.get(opts, :name, __MODULE__),  amqp: amqp, channel: channel, amqp_monitor: :erlang.monitor(:process, amqp), channel_monitor: :erlang.monitor(:process, channel) }
   end
 
   def init(opts) do
