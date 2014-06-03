@@ -1,6 +1,6 @@
 defmodule Exrabbit.Tools.Handler do
   use GenServer.Behaviour
-
+  require Lager
   #defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
 
   def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
