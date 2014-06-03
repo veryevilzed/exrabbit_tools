@@ -1,7 +1,7 @@
 defmodule Exrabbit.Tools.Handler do
   use GenServer.Behaviour
 
-  defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
+  #defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
 
   def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
 
@@ -41,7 +41,7 @@ defmodule Exrabbit.Tools.Handler do
   def init(opts) do
     name = Keyword.get(opts, :name, __MODULE__)
     :erlang.send_after 600, self, :init 
-    { :ok, %{ stete() | opts: opts, pg2: binary_to_atom "#{name}_listeners" } }
+    { :ok, %{ state() | opts: opts, pg2: binary_to_atom "#{name}_listeners" } }
   end
 
   def handle_call({:publish, exchange, routing_key, message}, _from, state=%{channel: channel}) do
@@ -65,7 +65,7 @@ defmodule Exrabbit.Tools.Handler do
     { :noreply, state }
   end
 
-  def handle_info(:init, state=State[]) do
+  def handle_info(:init, state=%{}) do
     state = rabbit_connect(state)
     { :noreply, state }
   end
@@ -80,8 +80,8 @@ defmodule Exrabbit.Tools.Handler do
     { :noreply, state }
   end
 
-  def handle_info(_, state=State[]), do: { :noreply, state }
+  def handle_info(_, state=%{}), do: { :noreply, state }
 
-  def terminate(_, State[amqp: amqp]), do: Exrabbit.Utils.disconnect(amqp)
+  def terminate(_, %{amqp: amqp}), do: Exrabbit.Utils.disconnect(amqp)
 
 end
