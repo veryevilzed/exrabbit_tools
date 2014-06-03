@@ -3,8 +3,12 @@ defmodule Exrabbit.Tools.Handler do
 
   defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
 
+  def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
+
   def start_link(opts \\ []) do
+    Lager.puts "#{inspect opts}"
     name = Keyword.get(opts, :name, __MODULE__)
+    Lager.puts "#{inspect name}"
     :gen_server.start_link({:local, name}, __MODULE__, opts, [])
   end
 
@@ -25,33 +29,32 @@ defmodule Exrabbit.Tools.Handler do
   defp ex_subscribe(_, _, _, _), do: :ok
 
 
-  defp rabbit_connect(state=State[opts: opts]) do
+  defp rabbit_connect(state=%{opts: opts}) do
     connect = Dict.get opts, :connect, [username: "guest", password: "guest", host: '127.0.0.1', virtual_host: "/", heartbeat: 5]
     amqp = Exrabbit.Utils.connect connect
     channel = Exrabbit.Utils.channel amqp
     Keyword.get(opts, :queue, :nil) |> q_subscribe(channel)
     Keyword.get(opts, :exchange, :nil) |> ex_subscribe(channel, Keyword.get(opts, :exchange_queue, nil), Keyword.get(opts, :exchange_key, ""))
-    state.amqp(amqp).channel(channel).amqp_monitor(:erlang.monitor :process, amqp).channel_monitor(:erlang.monitor :process, channel)
+    %{ state | amqp: amqp, channel: channel, amqp_monitor: :erlang.monitor(:process, amqp), channel_monitor: :erlang.monitor(:process, channel) }
   end
 
   def init(opts) do
     name = Keyword.get(opts, :name, __MODULE__)
     :erlang.send_after 600, self, :init 
-    { :ok, State.new().opts(opts).pg2(binary_to_atom "#{name}_listeners") }
+    { :ok, %{ stete() | opts: opts, pg2: binary_to_atom "#{name}_listeners" } }
   end
 
-  
-  def handle_call({:publish, exchange, routing_key, message}, _from, state=State[channel: channel]) do
+  def handle_call({:publish, exchange, routing_key, message}, _from, state=%{channel: channel}) do
     IO.puts "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
     {:reply, Exrabbit.Utils.publish(channel, exchange, routing_key, message, :wait_confirmation), state}
   end
 
-  def handle_call(_, _from, state=State[amqp: nil]), do: { :reply, :connection_down, state }
+  def handle_call(_, _from, state=%{amqp: nil}), do: { :reply, :connection_down, state }
 
-  def handle_call(_, _from, state=State[]), do: { :reply, :error, state }
+  def handle_call(_, _from, state=%{}), do: { :reply, :error, state }
   
 
-  def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=State[channel: channel, pg2: pg2_name, name: name]) do
+  def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=%{channel: channel, pg2: pg2_name, name: name}) do
     IO.puts "<-- #{inspect body}"
     IO.puts "<-- #{inspect name}"
     IO.puts "<-- #{inspect pg2_name}"
@@ -67,7 +70,7 @@ defmodule Exrabbit.Tools.Handler do
     { :noreply, state }
   end
 
-  def handle_info({:'DOWN', monitor_ref, _type, _object, _info}, state=State[name: name, amqp: amqp, amqp_monitor: amqp_monitor, channel_monitor: channel_monitor]) do
+  def handle_info({:'DOWN', monitor_ref, _type, _object, _info}, state=%{name: name, amqp: amqp, amqp_monitor: amqp_monitor, channel_monitor: channel_monitor}) do
     case monitor_ref do
       ^amqp_monitor -> :ok
       ^channel_monitor ->
