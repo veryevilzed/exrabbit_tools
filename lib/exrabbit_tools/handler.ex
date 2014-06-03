@@ -6,9 +6,9 @@ defmodule Exrabbit.Tools.Handler do
   def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
 
   def start_link(opts \\ []) do
-    Lager.puts "#{inspect opts}"
+    Lager.info "#{inspect opts}"
     name = Keyword.get(opts, :name, __MODULE__)
-    Lager.puts "#{inspect name}"
+    Lager.info "#{inspect name}"
     :gen_server.start_link({:local, name}, __MODULE__, opts, [])
   end
 
