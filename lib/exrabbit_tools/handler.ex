@@ -1,14 +1,14 @@
 defmodule Exrabbit.Tools.Handler do
   use GenServer.Behaviour
-  require Lager
+
   #defrecord State, [name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] ]
 
   def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
 
   def start_link(opts \\ []) do
-    Lager.info "#{inspect opts}"
+    IO.puts "#{inspect opts}"
     name = Keyword.get(opts, :name, __MODULE__)
-    Lager.info "#{inspect name}"
+    IO.puts "#{inspect name}"
     :gen_server.start_link({:local, name}, __MODULE__, opts, [])
   end
 
