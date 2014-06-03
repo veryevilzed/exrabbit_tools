@@ -56,8 +56,6 @@ defmodule Exrabbit.Tools.Handler do
 
   def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=%{channel: channel, pg2: pg2_name, name: name}) do
     IO.puts "<-- #{inspect body}"
-    IO.puts "<-- #{inspect name}"
-    IO.puts "<-- #{inspect pg2_name}"
     :pg2.get_members(pg2_name) |> Enum.each fn(pid) ->
       :gen_server.call pid, {:rabbit, {body, name} }
     end
