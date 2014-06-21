@@ -1,4 +1,6 @@
-%{"amqp_client": {:git, "git://github.com/jbrisbin/amqp_client.git", "2b8c2c5a3b647fc4b4733978046305acde611a43", []},
-  "exrabbit": {:git, "git@git.appforge.ru:elixir/exrabbit.git", "0c0ec704946aebb99a2c39414221fa2055b060aa", []},
-  "jazz": {:git, "git://github.com/meh/jazz.git", "3390472ca199328854c1f4401c588e9688072095", []},
-  "rabbit_common": {:git, "git://github.com/jbrisbin/rabbit_common.git", "99f27775da2e1763c723e41f8b9ca0a68b24ed19", [tag: "rabbitmq-3.0.2"]}}
+%{"amqp_client": {:git, "git://github.com/d0rc/amqp_client.git", "16b6c421139dba0a34d6c1e26f56c1dde5057a7f", []},
+  "exrabbit": {:git, "git://github.com/d0rc/exrabbit.git", "9823e83cc979d9570c06802647ed89fe44ecd370", []},
+  "jazz": {:git, "git://github.com/d0rc/jazz.git", "832431cf9c3134b1c3cd633e5b5d697db853efd6", [branch: "v0.14.1"]},
+  "rabbit_common": {:git, "git://github.com/issuu/rabbit_common.git", "e3484d3ea4d9b57ae12da58c5c9dcf529a686139", [tag: "v3.3.0"]},
+  "sweetconfig": {:git, "git://github.com/d0rc/sweetconfig.git", "c11fc16777e2048d25d4aada67fc50bb5ba04bd2", []},
+  "yamler": {:git, "git://github.com/goertzenator/yamler.git", "5084e38b7bf34fa74d1d064b3eec5cc185e6ca4b", [branch: "mapping_as_map"]}}
