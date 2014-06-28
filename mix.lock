@@ -1,6 +1,9 @@
 %{"amqp_client": {:git, "git://github.com/d0rc/amqp_client.git", "16b6c421139dba0a34d6c1e26f56c1dde5057a7f", []},
+  "exlager": {:git, "git://github.com/khia/exlager.git", "99eb3fb763ae546edfe2ac3dd181987a4872dfcc", []},
   "exrabbit": {:git, "git://github.com/d0rc/exrabbit.git", "9823e83cc979d9570c06802647ed89fe44ecd370", []},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
   "jazz": {:git, "git://github.com/d0rc/jazz.git", "832431cf9c3134b1c3cd633e5b5d697db853efd6", [branch: "v0.14.1"]},
+  "lager": {:git, "https://github.com/basho/lager.git", "4d8291edb72a25ac0efde907e2ecaa115108ff90", []},
   "rabbit_common": {:git, "git://github.com/issuu/rabbit_common.git", "e3484d3ea4d9b57ae12da58c5c9dcf529a686139", [tag: "v3.3.0"]},
   "sweetconfig": {:git, "git://github.com/d0rc/sweetconfig.git", "c11fc16777e2048d25d4aada67fc50bb5ba04bd2", []},
   "yamler": {:git, "git://github.com/goertzenator/yamler.git", "5084e38b7bf34fa74d1d064b3eec5cc185e6ca4b", [branch: "mapping_as_map"]}}
