@@ -41,7 +41,7 @@ defmodule Exrabbit.Tools.Handler do
   def init(opts) do
     name = Keyword.get(opts, :name, __MODULE__)
     :erlang.send_after 600, self, :init 
-    { :ok, %{ state() | opts: opts, pg2: binary_to_atom "#{name}_listeners" } }
+    { :ok, %{ state() | opts: opts, pg2: String.to_atom "#{name}_listeners" } }
   end
 
   def handle_call({:publish, exchange, routing_key, message}, _from, state=%{channel: channel}) do
@@ -56,10 +56,10 @@ defmodule Exrabbit.Tools.Handler do
 
   def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=%{channel: channel, pg2: pg2_name, name: name}) do
     #IO.puts "<-- #{inspect body}"
-    :pg2.get_members(pg2_name) |> Enum.each fn(pid) ->
-      :gen_server.call pid, {:rabbit, {body, name} }
+    case :gen_server.call :pg2.get_closest_pid(pg2_name), {:rabbit, {body, name} } do
+        :ok -> Exrabbit.Utils.ack channel, tag
+        _ -> Exrabbit.Utils.nack channel, tag
     end
-    Exrabbit.Utils.ack channel, tag
     { :noreply, state }
   end
 
