@@ -54,9 +54,10 @@ defmodule Exrabbit.Tools.Handler do
   
   def handle_info({basic_deliver(delivery_tag: tag), amqp_msg(payload: body)}, state=%{channel: channel, pg2: pg2_name, name: name}) do
     :pg2.get_members(pg2_name) |> Enum.each fn(pid) ->
-      :gen_server.call pid, {:rabbit, {body, name} }
+      case :gen_server.call pid, {:rabbit, {body, name} } do
         :ok -> Exrabbit.Utils.ack channel, tag
         _ -> Exrabbit.Utils.nack channel, tag
+      end
     end
     { :noreply, state }
   end
