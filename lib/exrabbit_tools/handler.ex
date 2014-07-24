@@ -54,7 +54,7 @@ defmodule Exrabbit.Tools.Handler do
   def handle_call(_, _from, state=%{}), do: { :reply, :error, state }
   
 
-  def handle_info({:'basic.deliver'[delivery_tag: tag], :amqp_msg[payload: body]}, state=%{channel: channel, pg2: pg2_name, name: name}) do
+  def handle_info({:'basic.deliver'(delivery_tag: tag), :amqp_msg(payload: body)}, state=%{channel: channel, pg2: pg2_name, name: name}) do
     #IO.puts "<-- #{inspect body}"
     case :gen_server.call :pg2.get_closest_pid(pg2_name), {:rabbit, {body, name} } do
         :ok -> Exrabbit.Utils.ack channel, tag
