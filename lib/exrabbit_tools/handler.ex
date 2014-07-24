@@ -60,7 +60,6 @@ defmodule Exrabbit.Tools.Handler do
           :ok -> Exrabbit.Utils.ack channel, tag
           _ -> Exrabbit.Utils.nack channel, tag
         end
-      end
     end
     { :noreply, state }
   end
