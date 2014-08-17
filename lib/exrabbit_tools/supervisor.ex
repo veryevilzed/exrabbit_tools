@@ -8,7 +8,7 @@ defmodule Exrabbit.Tools.Supervisor do
   
   def get_listeners(configs) do
     configs |> Enum.map fn({name, opts}) -> 
-      Lagger.debug "Create worker #{name}"
+      Logger.debug "Create worker #{name}"
       name = case name do
         name when is_binary name -> String.to_atom(name)
         name -> name
