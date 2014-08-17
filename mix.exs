@@ -15,8 +15,7 @@ defmodule Exrabbit.Tools.Mixfile do
 
   defp deps do
     [ 
-      { :exrabbit, github: "d0rc/exrabbit" }, 
-      { :exlager, github: "khia/exlager" } 
+      { :exrabbit, github: "d0rc/exrabbit" }
     ]
   end
 end
