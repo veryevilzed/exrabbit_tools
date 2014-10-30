@@ -1,13 +1,13 @@
 defmodule Exrabbit.Tools.Handler do
   use GenServer
   import Exrabbit.Defs
-  require Lager
+  require Logger
 
   def state(), do: %{name: __MODULE__, amqp: nil, channel: nil, amqp_monitor: nil, channel_monitor: nil, pg2: nil, opts: [] }
 
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
-    Lager.info "Start handler #{inspect name} with opts: #{inspect opts}"
+    Logger.info "Start handler #{inspect name} with opts: #{inspect opts}"
     :gen_server.start_link({:local, name}, __MODULE__, opts, [])
   end
 
@@ -44,7 +44,7 @@ defmodule Exrabbit.Tools.Handler do
   end
 
   def handle_call({:publish, exchange, routing_key, message}, _from, state=%{channel: channel}) do
-    Lager.info "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
+    Logger.info "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
     {:reply, Exrabbit.Utils.publish(channel, exchange, routing_key, message, :wait_confirmation), state}
   end
 
@@ -83,7 +83,7 @@ defmodule Exrabbit.Tools.Handler do
 
   def terminate(r, %{amqp: amqp, opts: opts}) do
     name = Keyword.get(opts, :name, __MODULE__)
-    Lager.error "Handler #{inspect name} terminate: #{inspect r}"
+    Logger.error "Handler #{inspect name} terminate: #{inspect r}"
     Exrabbit.Utils.disconnect(amqp)
   end
 
