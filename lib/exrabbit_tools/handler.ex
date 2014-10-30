@@ -44,7 +44,7 @@ defmodule Exrabbit.Tools.Handler do
   end
 
   def handle_call({:publish, exchange, routing_key, message}, _from, state=%{channel: channel}) do
-    Logger.info "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
+    Logger.debug "Try to Send #{exchange}(#{routing_key}) message #{message} ..."
     {:reply, Exrabbit.Utils.publish(channel, exchange, routing_key, message, :wait_confirmation), state}
   end
 

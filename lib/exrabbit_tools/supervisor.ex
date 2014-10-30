@@ -1,6 +1,6 @@
 defmodule Exrabbit.Tools.Supervisor do
   use Supervisor
-
+  require Logger
   def start_link do
     :supervisor.start_link(__MODULE__, [])
   end
@@ -8,7 +8,7 @@ defmodule Exrabbit.Tools.Supervisor do
   
   def get_listeners(configs) do
     configs |> Enum.map fn({name, opts}) -> 
-      IO.puts "Create worker #{name}"
+      Logger.debug "Create worker #{name}"
       name = case name do
         name when is_binary name -> String.to_atom(name)
         name -> name
